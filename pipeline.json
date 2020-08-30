@@ -1,0 +1,93 @@
+{
+    "name": "bluegreen",
+    "id": "bluegreen",
+    "application": "aspnetapp",
+    "appConfig": {},
+    "description": "Blue/Green deployment",
+    "executionEngine": "v2",
+    "parameterConfig": [],
+    "stages": [
+      {
+        "account": "default",
+        "cloudProvider": "kubernetes",
+        "manifestArtifactAccount": "embedded-artifact",
+        "manifests": [
+          {
+            "apiVersion": "apps/v1",
+            "kind": "ReplicaSet",
+            "metadata": {
+              "annotations": {
+                "strategy.spinnaker.io/max-version-history": "2",
+                "traffic.spinnaker.io/load-balancers": "[\"service aspnetapp\"]"
+              },
+              "labels": {
+                "tier": "aspnetapp"
+              },
+              "name": "aspnetapp",
+              "namespace": "default"
+            },
+            "spec": {
+              "replicas": 2,
+              "selector": {
+                "matchLabels": {
+                  "tier": "aspnetapp"
+                }
+              },
+              "template": {
+                "metadata": {
+                  "labels": {
+                    "app": "aspnetapp",
+                    "tier": "aspnetapp"
+                  }
+                },
+                "spec": {
+                  "containers": [
+                    {
+                      "image": "mcr.microsoft.com/dotnet/core/samples:aspnetapp",
+                      "imagePullPolicy": "IfNotPresent",
+                      "name": "aspnetapp",
+                      "ports": [
+                        {
+                          "containerPort": 6000
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "moniker": {
+          "app": "aspnetapp"
+        },
+        "name": "Deploy (Manifest)",
+        "refId": "1",
+        "relationships": {
+          "loadBalancers": [],
+          "securityGroups": []
+        },
+        "requisiteStageRefIds": [],
+        "source": "text",
+        "type": "deployManifest"
+      },
+      {
+        "account": "default",
+        "app": "aspnetapp",
+        "cloudProvider": "kubernetes",
+        "cluster": "replicaSet aspnetapp",
+        "criteria": "second_newest",
+        "kind": "replicaSet",
+        "location": "default",
+        "manifestName": " ",
+        "mode": "dynamic",
+        "name": "Disable (Manifest)",
+        "refId": "2",
+        "requisiteStageRefIds": [
+          "1"
+        ],
+        "type": "disableManifest"
+      }
+    ],
+    "triggers": []
+  }

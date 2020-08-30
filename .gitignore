@@ -1,0 +1,6 @@
+
+*.exe
+*.tmp
+**/.terraform
+charts/
+chocolatey/

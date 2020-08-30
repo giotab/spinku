@@ -92,4 +92,4 @@ Write-Host "Setting Green/blue deployment on two replicas" -ForegroundColor Blue
 spin pipeline save -f pipeline.json
 
 $stopwatch.Stop()
-Write-Host ("The process took {0} milliseconds" -f $stopwatch.ElapsedMilliseconds) -ForegroundColor DarkGreen
+Write-Host ("The process took {0} minutes and {1}.{2} seconds" -f $stopwatch.Elapsed.Minutes,$stopwatch.Elapsed.Seconds,$stopwatch.Elapsed.Milliseconds) -ForegroundColor DarkGreen

@@ -97,5 +97,3 @@ Write-Host ("The process took {0} minutes and {1}.{2} seconds" -f $stopwatch.Ela
 Write-Host Access spinnaker UI at http://127.0.0.1:$(((kubectl get service -n spinnaker "spin-deck" -o json) | ConvertFrom-Json).spec.ports[0].port) -ForegroundColor DarkYellow
 
 Write-Host "Access sample aspnet app at http://127.0.0.1:7000" -ForegroundColor DarkYellow
-
-Write-Host "Setting Green/blue deployment on two replicas" -ForegroundColor DarkYellow

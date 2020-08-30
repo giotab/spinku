@@ -42,11 +42,11 @@ Write-Host "Infrastructure is setup" -ForegroundColor Yellow
     Write-Host "Cluster did not start up"  -ForegroundColor Red
   }
 
+kubectl proxy &
+Write-Host "Kubernetes Proxy is running at http://127.0.0.1:8081"  -ForegroundColor Yellow
+
 # Add spinaker
 # Have to modify the minion version due to misliagned code
-
-kubectl proxy &
-Write-Host "Proxy is running at http://127.0.0.1:8081"  -ForegroundColor Yellow
 
 Write-Host "Getting spinnaker files"  -ForegroundColor Yellow
   git clone https://github.com/helm/charts.git
@@ -74,7 +74,6 @@ Write-Host "Setting up port forwarding for spinnaker" -ForegroundColor Yellow
   kubectl wait --for=condition=Ready pod/$deckPod --namespace spinnaker --timeout=300s
   kubectl port-forward --namespace spinnaker $deckPod $(((kubectl get service -n spinnaker "spin-deck" -o json) | ConvertFrom-Json).spec.ports[0].port) &
 Write-Host "Set up port forwarding for spinnaker" -ForegroundColor Yellow
-Write-Host Access spinnaker UI at http://127.0.0.1:$(((kubectl get service -n spinnaker "spin-deck" -o json) | ConvertFrom-Json).spec.ports[0].port) -ForegroundColor Blue
 
 # Download sample aspnet app
 Write-Host "Setting sample app"  -ForegroundColor Yellow
@@ -86,10 +85,17 @@ Write-Host "Setting up port forwarding for aspnet app" -ForegroundColor Yellow
   kubectl port-forward aspnetapp 7000:$(((kubectl get service "aspnetapp" -o json) | ConvertFrom-Json).spec.ports[0].port) &
 Write-Host "Set up port forwarding for aspnet app" -ForegroundColor Yellow
 
-Write-Host "Access sample aspnet app at http://127.0.0.1:7000" -ForegroundColor Blue
-
-Write-Host "Setting Green/blue deployment on two replicas" -ForegroundColor Blue
+Write-Host "Setting up blue/green pipeline" -ForegroundColor Yellow
 spin pipeline save -f pipeline.json
+
+spin pipeline execute --name bluegreen --application aspnetapp
+Write-Host "Setup  blue/green pipeline" -ForegroundColor Yellow
 
 $stopwatch.Stop()
 Write-Host ("The process took {0} minutes and {1}.{2} seconds" -f $stopwatch.Elapsed.Minutes,$stopwatch.Elapsed.Seconds,$stopwatch.Elapsed.Milliseconds) -ForegroundColor DarkGreen
+
+Write-Host Access spinnaker UI at http://127.0.0.1:$(((kubectl get service -n spinnaker "spin-deck" -o json) | ConvertFrom-Json).spec.ports[0].port) -ForegroundColor DarkYellow
+
+Write-Host "Access sample aspnet app at http://127.0.0.1:7000" -ForegroundColor DarkYellow
+
+Write-Host "Setting Green/blue deployment on two replicas" -ForegroundColor DarkYellow

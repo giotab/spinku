@@ -1,6 +1,6 @@
 # Kubernetes, Helm and Spinnaker on AKS
 
-# Overview
+## Overview
 
 This solution deploys a Kubernetes (1.15.3) cluster on AKS, installs helm locally and spinnaker on the cluster.
 
